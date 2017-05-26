@@ -46,7 +46,9 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
 
-    //初期化処理
+    /**
+     * 初期化処理
+     */
     private void init(){
 
         //サーフェスビュー操作のための用意
@@ -102,8 +104,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
 
-    /*
-        画面がタッチされた際の操作
+    /**
+     * 画面がタッチされた際の操作
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -125,8 +127,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         return true;
     }
 
-    /*
-        画面をタッチした際のPathの開始位置の決定
+    /**
+     *  画面をタッチした際のPathの開始位置の決定
      */
     private void onTouchDown(float x, float y){
         mPath = new Path();
@@ -141,8 +143,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         drawLine(mPath);
     }
 
-    /*
-        画面を離した時の座標を記録を決定
+    /**
+     * 画面を離した時の座標を記録を決定
      */
     private void onTouchUp(float x ,float y){
         mPath.lineTo(x, y);
@@ -152,9 +154,9 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mRedoStack.clear();
     }
 
-    /*
-        onTouchMove()の際にキャンバスをロックし
-        線を描画していく
+    /**
+     *  onTouchMove()の際にキャンバスをロックし
+     *  線を描画していく
      */
     private void drawLine(Path path){
         //ロックしてキャンバス取得
@@ -174,13 +176,17 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     }
 
+
+    /**
+     * 直前の操作を取り消して元の状態に戻す
+     */
     public void undo(){
-        if(mUndoStack.isEmpty()){
+        if(mUndoStack.isEmpty()){   //戻せない場合
             return;
         }
 
-        //udoスタックからパスを取り出しredoスタックに格納
-        Path lastUndoPath = mUndoStack.removeLast();
+        //undoスタックからパスを取り出しredoスタックに格納
+        Path lastUndoPath = mUndoStack.removeLast();    //removeLast():キューの最後の要素を取得して削除
         mRedoStack.addLast(lastUndoPath);
 
         //ロックしてキャンバスを取得する
