@@ -124,7 +124,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private void onTouchDown(float x, float y){
         mPath = new Path();
-        mPath.moveTo(x, y);     //開始位置の
+        mPath.moveTo(x, y);     //開始位置の座標の取得
     }
 
     private void onTouchMove(float x, float y){
