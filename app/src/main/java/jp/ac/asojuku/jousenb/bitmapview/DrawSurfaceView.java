@@ -89,6 +89,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
 
+    //SurfaceViewが作られた際にBitmapとCanvasがなければ作る
     private void clearLastDrawBitmap(){
         if(mLastDrawBitmap == null){        //Bitmapが作られていない場合
             mLastDrawBitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
@@ -101,9 +102,11 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
 
-
+    /*
+        画面がタッチされた際の操作
+     */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {    //画面にタッチされていた場合
+    public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:   //画面にタッチした時
                 onTouchDown(event.getX(),event.getY());
@@ -122,16 +125,25 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         return true;
     }
 
+    /*
+        画面をタッチした際のPathの開始位置の決定
+     */
     private void onTouchDown(float x, float y){
         mPath = new Path();
-        mPath.moveTo(x, y);     //開始位置の座標の取得
+        mPath.moveTo(x, y);     //開始位置の座標の決定
     }
 
+    /*
+        画面をタッチして移動した時の座標を記録していく
+     */
     private void onTouchMove(float x, float y){
-        mPath.lineTo(x,y);
+        mPath.lineTo(x,y);  //描画する座標を決定
         drawLine(mPath);
     }
 
+    /*
+        画面を離した時の座標を記録を決定
+     */
     private void onTouchUp(float x ,float y){
         mPath.lineTo(x, y);
         drawLine(mPath);
@@ -140,6 +152,10 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mRedoStack.clear();
     }
 
+    /*
+        onTouchMove()の際にキャンバスをロックし
+        線を描画していく
+     */
     private void drawLine(Path path){
         //ロックしてキャンバス取得
         Canvas canvas = mHolder.lockCanvas();
@@ -215,7 +231,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mHolder.unlockCanvasAndPost(canvas);
     }
 
-    public void colorchange(){
+    public void colorhange(){
 
         color++;
         if(color%2 == 0){
