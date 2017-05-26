@@ -29,18 +29,27 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private Canvas mLastDrawCanvas;
     private Deque<Path> mUndoStack = new ArrayDeque<Path>();
     private Deque<Path> mRedoStack = new ArrayDeque<Path>();
+    private int color;
 
+
+    //コンストラクタ
     public DrawSurfaceView(Context context){
         super(context);
         init();
     }
 
+
+    //コンストラクタ
     public DrawSurfaceView(Context context, AttributeSet attrs){
         super(context,attrs);
         init();
     }
 
+
+    //初期化処理
     private void init(){
+
+        //サーフェスビュー操作のための用意
         mHolder = getHolder();
 
         //透過
@@ -59,35 +68,42 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mPaint.setStrokeWidth(6);
     }
 
+
+    //SurfaceViewが作られた時
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         //描画状態を保存するBitmapを作成する
         clearLastDrawBitmap();
     }
 
+    //SurfaceViewが変更された時
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
 
     }
 
+    //SurfaceViewが破棄された時
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         mLastDrawBitmap.recycle();
     }
 
+
     private void clearLastDrawBitmap(){
-        if(mLastDrawBitmap == null){
+        if(mLastDrawBitmap == null){        //Bitmapが作られていない場合
             mLastDrawBitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
         }
-        if(mLastDrawCanvas == null){
+        if(mLastDrawCanvas == null){        //Canvasが作られていない場合
             mLastDrawCanvas = new Canvas(mLastDrawBitmap);
         }
 
         mLastDrawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
     }
 
+
+
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {    //画面にタッチされていた場合
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:   //画面にタッチした時
                 onTouchDown(event.getX(),event.getY());
@@ -108,7 +124,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     private void onTouchDown(float x, float y){
         mPath = new Path();
-        mPath.moveTo(x, y);
+        mPath.moveTo(x, y);     //開始位置の
     }
 
     private void onTouchMove(float x, float y){
@@ -197,6 +213,17 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         Canvas canvas = mHolder.lockCanvas();
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
         mHolder.unlockCanvasAndPost(canvas);
+    }
+
+    public void colorchange(){
+
+        color++;
+        if(color%2 == 0){
+            mPaint.setColor(Color.RED);
+        }else{
+            mPaint.setColor(Color.YELLOW);
+        }
+
     }
 
 
