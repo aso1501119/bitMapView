@@ -12,6 +12,7 @@ public class MainActivity extends AppCompatActivity {
     private Button undo;
     private Button redo;
     private Button reset;
+    private Button color;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                mCamvasView.colorchange();
+                mCamvasView.hutosa();
+            }
+        });
+
+        color = (Button)findViewById(R.id.colorBtn);
+        color.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCamvasView.colorChange();
+
             }
         });
 

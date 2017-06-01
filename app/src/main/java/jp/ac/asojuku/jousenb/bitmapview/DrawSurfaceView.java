@@ -27,9 +27,10 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private Path    mPath;
     private Bitmap mLastDrawBitmap;
     private Canvas mLastDrawCanvas;
-    private Deque<Path> mUndoStack = new ArrayDeque<Path>();
-    private Deque<Path> mRedoStack = new ArrayDeque<Path>();
-    private int color;
+    private OekakiPath oekakiPath;
+    private Deque<OekakiPath> mUndoStack = new ArrayDeque<OekakiPath>();
+    private Deque<OekakiPath> mRedoStack = new ArrayDeque<OekakiPath>();
+
 
 
     //コンストラクタ
@@ -135,12 +136,13 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mPath.moveTo(x, y);     //開始位置の座標の決定
     }
 
-    /*
-        画面をタッチして移動した時の座標を記録していく
+    /**
+     *  画面をタッチして移動した時の座標を記録していく
      */
     private void onTouchMove(float x, float y){
         mPath.lineTo(x,y);  //描画する座標を決定
-        drawLine(mPath);
+        oekakiPath.setAll(mPath,mPaint);
+        drawLine(oekakiPath);
     }
 
     /**
@@ -148,9 +150,12 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      */
     private void onTouchUp(float x ,float y){
         mPath.lineTo(x, y);
-        drawLine(mPath);
+        oekakiPath.setPath(mPath);
+        oekakiPath.setPaint(mPaint);
+        drawLine(oekakiPath);
+        oekakiPath  = new OekakiPath(mPath,mPaint);
         mLastDrawCanvas.drawPath(mPath,mPaint);
-        mUndoStack.addLast(mPath);
+        mUndoStack.addLast(oekakiPath);
         mRedoStack.clear();
     }
 
@@ -158,7 +163,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      *  onTouchMove()の際にキャンバスをロックし
      *  線を描画していく
      */
-    private void drawLine(Path path){
+    private void drawLine(OekakiPath path){
         //ロックしてキャンバス取得
         Canvas canvas = mHolder.lockCanvas();
 
@@ -169,7 +174,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         canvas.drawBitmap(mLastDrawBitmap,0,0,null);
 
         //パスを描画する
-        canvas.drawPath(path,mPaint);
+        canvas.drawPath(path.getPath(),path.getPaint());
 
         //ロックを外す
         mHolder.unlockCanvasAndPost(canvas);
@@ -181,13 +186,13 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      * 直前の操作を取り消して元の状態に戻す
      */
     public void undo(){
-        if(mUndoStack.isEmpty()){   //戻せない場合
+        if(mUndoStack.isEmpty()){   //mUdoStackが空の場合
             return;
         }
 
         //undoスタックからパスを取り出しredoスタックに格納
-        Path lastUndoPath = mUndoStack.removeLast();    //removeLast():キューの最後の要素を取得して削除
-        mRedoStack.addLast(lastUndoPath);
+        OekakiPath lastUndoPath = mUndoStack.removeLast();    //removeLast():キューの最後の要素を取得して削除
+        mRedoStack.addLast(lastUndoPath);               //mRedoStackの最後にデータを入れる
 
         //ロックしてキャンバスを取得する
         Canvas canvas = mHolder.lockCanvas();
@@ -199,37 +204,42 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         clearLastDrawBitmap();
 
         //パスを描画する
-        for (Path path : mUndoStack){
-            canvas.drawPath(path,mPaint);
-            mLastDrawCanvas.drawPath(path,mPaint);
+        for (OekakiPath path : mRedoStack){
+            canvas.drawPath(path.getPath(),path.getPaint());
+            mLastDrawCanvas.drawPath(path.getPath(),path.getPaint());
         }
 
         //ロックを外す
         mHolder.unlockCanvasAndPost(canvas);
     }
 
+    /**
+     *  直前に取り消した処理を、もう一度繰り返して実行する
+     */
     public void  redo(){
-        if(mRedoStack.isEmpty()){
+        if(mRedoStack.isEmpty()){   //mRedoStackが空の場合
             return;
         }
 
         // redoスタックからパスを取り出し、undoスタックに格納します
-        Path lastRedoPath = mRedoStack.removeLast();
+        OekakiPath lastRedoPath = mRedoStack.removeLast();    //removeLast():キューの最後の要素を取得して削除
         mUndoStack.addLast(lastRedoPath);
 
         //パスを描画します
         drawLine(lastRedoPath);
-
         mLastDrawCanvas.drawPath(lastRedoPath,mPaint);
     }
 
+    /**
+     * キャンバスをクリアにする
+     */
     public void reset(){
 
         //スタックをからにする
         mUndoStack.clear();
         mRedoStack.clear();
 
-
+        //描画状態を保持するBitmapをクリア
         clearLastDrawBitmap();
 
         Canvas canvas = mHolder.lockCanvas();
@@ -237,13 +247,37 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         mHolder.unlockCanvasAndPost(canvas);
     }
 
-    public void colorhange(){
+    /**
+     * 色の変更
+     */
+    public void colorChange(){
+        i++;
+        if(i%2==0){
+            mPaint.setColor(Color.BLACK);
 
-        color++;
-        if(color%2 == 0){
-            mPaint.setColor(Color.RED);
+        }else {
+            mPaint.setColor(Color.CYAN);
+
+        }
+    }
+
+    int i = 0;
+
+    /**
+     * 太さの変更
+     *
+     * 細い:5
+     * 基本:15
+     * 太い:25
+     */
+    protected void hutosa(){
+        i++;
+        if(i%3 == 0){
+            mPaint.setStrokeWidth(5);
+        }else if(i %3 == 1){
+            mPaint.setStrokeWidth(15);
         }else{
-            mPaint.setColor(Color.YELLOW);
+            mPaint.setStrokeWidth(25);
         }
 
     }
