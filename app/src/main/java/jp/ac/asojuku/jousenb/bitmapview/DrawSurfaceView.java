@@ -54,6 +54,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         //サーフェスビュー操作のための用意
         mHolder = getHolder();
+        oekakiPath = new OekakiPath();
+
 
         //透過
         setZOrderOnTop(true);
@@ -227,7 +229,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         //パスを描画します
         drawLine(lastRedoPath);
-        mLastDrawCanvas.drawPath(lastRedoPath,mPaint);
+        mLastDrawCanvas.drawPath(mPath,mPaint);
     }
 
     /**

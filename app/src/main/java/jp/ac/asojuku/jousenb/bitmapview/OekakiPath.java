@@ -1,6 +1,5 @@
 package jp.ac.asojuku.jousenb.bitmapview;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Path;
 
@@ -8,12 +7,13 @@ import android.graphics.Path;
  * Created by Syu on 2017/06/01.
  */
 
-public class OekakiPath extends Path {
+public class OekakiPath {
 
     private Path path;
     private Paint paint;
 
-
+    public OekakiPath(){
+    }
     //コンストラクタ
     public OekakiPath(Path path , Paint paint){
         this.path = path;
