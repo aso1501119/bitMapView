@@ -1,5 +1,6 @@
 package jp.ac.asojuku.jousenb.bitmapview;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -39,7 +40,6 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         super(context);
         init();
     }
-
 
     //コンストラクタ
     public DrawSurfaceView(Context context, AttributeSet attrs){
@@ -279,6 +279,12 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }else{
             mPaint.setStrokeWidth(25);
         }
+
+    }
+
+    protected  void setColor(){
+
+
 
     }
 

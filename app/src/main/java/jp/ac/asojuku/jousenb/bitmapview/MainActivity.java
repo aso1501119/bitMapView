@@ -1,9 +1,12 @@
 package jp.ac.asojuku.jousenb.bitmapview;
 
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,10 +17,13 @@ public class MainActivity extends AppCompatActivity {
     private Button reset;
     private Button color;
 
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
 
         mCamvasView = (DrawSurfaceView)findViewById(R.id.canvasView);
@@ -39,13 +45,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        reset = (Button)findViewById(R.id.resetBtn);
 
+        /**
+         * リセットボタンの実装
+         */
+        reset = (Button)findViewById(R.id.resetBtn);
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                mCamvasView.hutosa();
+                mCamvasView.reset();
             }
         });
 
@@ -55,8 +64,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mCamvasView.colorChange();
 
+
             }
         });
+
+
 
 
     }
