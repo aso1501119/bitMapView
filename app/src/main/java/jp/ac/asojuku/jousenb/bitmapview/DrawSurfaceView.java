@@ -18,6 +18,7 @@ import java.util.Deque;
 
 /**
  * Created by Syu on 2017/05/25.
+ * Edited by Murofushi on 2017/06/06.
  */
 
 public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
@@ -27,7 +28,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     private Path    mPath;
     private Bitmap mLastDrawBitmap;
     private Canvas mLastDrawCanvas;
-    private OekakiPath oekakiPath;
+    private OekakiPath mOekaki;
     private Deque<OekakiPath> mUndoStack = new ArrayDeque<OekakiPath>();
     private Deque<OekakiPath> mRedoStack = new ArrayDeque<OekakiPath>();
 
@@ -54,8 +55,6 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         //サーフェスビュー操作のための用意
         mHolder = getHolder();
-        oekakiPath = new OekakiPath();
-
 
         //透過
         setZOrderOnTop(true);
@@ -135,6 +134,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      */
     private void onTouchDown(float x, float y){
         mPath = new Path();
+        mOekaki = new OekakiPath();
+        mOekaki.setPaint(new Paint(mPaint));
         mPath.moveTo(x, y);     //開始位置の座標の決定
     }
 
@@ -143,8 +144,8 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      */
     private void onTouchMove(float x, float y){
         mPath.lineTo(x,y);  //描画する座標を決定
-        oekakiPath.setAll(mPath,mPaint);
-        drawLine(oekakiPath);
+        mOekaki.setPath(mPath);
+        drawLine(mOekaki);
     }
 
     /**
@@ -152,12 +153,9 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
      */
     private void onTouchUp(float x ,float y){
         mPath.lineTo(x, y);
-        oekakiPath.setPath(mPath);
-        oekakiPath.setPaint(mPaint);
-        drawLine(oekakiPath);
-        oekakiPath  = new OekakiPath(mPath,mPaint);
-        mLastDrawCanvas.drawPath(mPath,mPaint);
-        mUndoStack.addLast(oekakiPath);
+        drawLine(mOekaki);
+        mLastDrawCanvas.drawPath(mOekaki.getPath(), mOekaki.getPaint());
+        mUndoStack.addLast(mOekaki);
         mRedoStack.clear();
     }
 
@@ -206,7 +204,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         clearLastDrawBitmap();
 
         //パスを描画する
-        for (OekakiPath path : mRedoStack){
+        for (OekakiPath path : mUndoStack){
             canvas.drawPath(path.getPath(),path.getPaint());
             mLastDrawCanvas.drawPath(path.getPath(),path.getPaint());
         }
@@ -229,7 +227,7 @@ public class DrawSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         //パスを描画します
         drawLine(lastRedoPath);
-        mLastDrawCanvas.drawPath(mPath,mPaint);
+        mLastDrawCanvas.drawPath(lastRedoPath.getPath(),lastRedoPath.getPaint());
     }
 
     /**
