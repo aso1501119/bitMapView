@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         mResetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCamvasView.hutosa();
+                mCamvasView.reset();
             }
         });
 
