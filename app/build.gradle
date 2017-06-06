@@ -29,4 +29,10 @@ dependencies {
 
 
     testCompile 'junit:junit:4.12'
+    compile(name:'SkyWay', ext:'aar')
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 }
